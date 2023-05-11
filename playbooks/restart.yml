@@ -1,0 +1,10 @@
+- name: Restart JupyterHub
+  # ========================================================
+  hosts: "{{ cmd_hosts | default('jupyterhub') }}"
+  become: true
+
+  roles:
+    - restart
+#
+# ========================================================
+# sudo ansible-playbook playbooks/restart.yml -i inventories/cassiopee/hosts.ini

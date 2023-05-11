@@ -1,0 +1,3 @@
+---
+- name: JupyterHub | Restart JupyterHub
+  shell: systemctl restart jupyterhub
