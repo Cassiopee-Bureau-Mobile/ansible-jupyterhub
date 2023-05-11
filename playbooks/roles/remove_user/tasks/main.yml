@@ -1,0 +1,7 @@
+---
+- name: JupyterHub | Remove User | Set variables
+  include_vars: ../../jupyterhub/defaults/main.yml
+
+- name: JupyterHub | Remove User | Remove user
+  include: remove.yml
+  when: username is defined

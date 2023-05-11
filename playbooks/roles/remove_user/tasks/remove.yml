@@ -1,0 +1,18 @@
+---
+- name: JupyterHub | Remove User | Verify that user exist
+  shell: "id {{ username }}"
+  register: existing_users
+  ignore_errors: true
+
+- name: JupyterHub | Remove User |  Kill user servers
+  shell: "pkill -u {{ username }} -f 'jupyterhub-singleuser'"
+  ignore_errors: true
+  when: existing_users.rc == 0
+
+- name: JupyterHub | Remove User | Remove user
+  user:
+    name: "{{ username }}"
+    state: absent
+    remove: true
+    force: true
+  when: existing_users.rc == 0

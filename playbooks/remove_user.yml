@@ -1,0 +1,11 @@
+- name: Remove user access
+  # ========================================================
+  # Allows caller to override hosts using '-e cmd_hosts='
+  hosts: "{{ cmd_hosts | default('jupyterhub') }}"
+  become: true
+
+  roles:
+    - remove_user
+#
+# ========================================================
+# sudo ansible-playbook playbooks/remove_user.yml -i inventories/cassiopee/hosts.ini --extra-vars "username=foo"
