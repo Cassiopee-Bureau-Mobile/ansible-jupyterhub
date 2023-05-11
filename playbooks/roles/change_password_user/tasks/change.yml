@@ -1,0 +1,13 @@
+---
+- name: JupyterHub | Change User password | Check if user exists
+  shell: "id {{ username }}"
+  register: user_exists
+  failed_when: false
+  changed_when: false
+
+- name: JupyterHub | Change User password | Change user password
+  user:
+    name: "{{ username }}"
+    password: "{{ password | password_hash('sha512') }}"
+    update_password: always
+  when: user_exists.rc == 0
