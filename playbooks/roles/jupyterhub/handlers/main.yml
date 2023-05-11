@@ -1,0 +1,12 @@
+---
+- name: clear history
+  shell: cat /dev/null > ~/.bash_history && history -c
+  args:
+    executable: /bin/bash
+  changed_when: false
+
+- name: start jupyterhub
+  service:
+    name: jupyterhub
+    state: started
+    enabled: yes

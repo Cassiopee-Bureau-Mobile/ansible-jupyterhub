@@ -1,0 +1,24 @@
+---
+- name: JupyterHub | Nginx | Setup nginx available sites
+  template:
+    src: jupyterhub.conf.j2
+    dest: /etc/nginx/sites-available/jupyterhub
+    owner: root
+    group: root
+    mode: 0644
+
+- name: JupyterHub | Nginx | Setup nginx enabled sites
+  file:
+    src: /etc/nginx/sites-available/jupyterhub
+    dest: /etc/nginx/sites-enabled/jupyterhub
+    state: link
+
+- name: JupyterHub | Nginx | Setup nginx default site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: JupyterHub | Nginx | Restart nginx
+  service:
+    name: nginx
+    state: restarted

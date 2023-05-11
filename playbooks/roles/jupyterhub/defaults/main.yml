@@ -1,0 +1,17 @@
+---
+required_packages:
+  - sudo
+  - python3-pip
+  - python3-virtualenv
+  - python3-venv
+  - python3-dev
+  - npm
+  - nodejs
+  - curl
+  - nginx
+  - git
+  # Used to verify GPG signatures for mirrored packages
+  - gnupg
+  - iptables
+  # Word List dictionary used by several roles to generate random data
+  - "{{ package_name_words }}"

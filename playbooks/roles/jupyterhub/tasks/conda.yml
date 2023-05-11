@@ -1,0 +1,29 @@
+---
+- name: JupyterHub | conda | Link conda to profile
+  file:
+    src: /opt/conda/etc/profile.d/conda.sh
+    dest: /etc/profile.d/conda.sh
+    state: link
+
+- name: JupyterHub | conda | Install default conda environment directory
+  file:
+    path: /opt/conda/envs
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: JupyterHub | conda | Create conda environment
+  shell: /opt/conda/bin/conda create --prefix /opt/conda/envs/python3.10 python=3.10 ipykernel -y
+  args:
+    creates: /opt/conda/envs/python3.10
+
+- name: JupyterHub | conda | Install ipykernel
+  command:
+    cmd: /opt/conda/envs/python3.10/bin/python -m ipykernel install --prefix=/opt/jupyterhub/ --name 'python' --display-name "Python (default)"
+    creates: /opt/jupyterhub/share/jupyter/kernels/python
+
+- name: JupyterHub | conda | Install Notebook-Runner
+  shell: /opt/conda/envs/python3.10/bin/pip install git+{{notebook_runner_git_url}}
+  args:
+    creates: /opt/conda/envs/python3.10/lib/python3.10/site-packages/notebook_runner

@@ -1,0 +1,64 @@
+---
+- name: JupyterHub | Config | Create config file directory and set permissions
+  file:
+    path: /opt/jupyterhub/etc/jupyterhub
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: JupyterHub | Config | Generate config file
+  shell: /opt/jupyterhub/bin/jupyterhub --generate-config
+  args:
+    chdir: /opt/jupyterhub/etc/jupyterhub
+    creates: /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+
+- name: JupyterHub | Config | Set default_url
+  lineinfile:
+    path: /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+    regexp: "c.Spawner.default_url ="
+    line: "c.Spawner.default_url = '/lab'"
+    insertafter: EOF
+
+- name: JupyterHub | Config | Set admin_users
+  lineinfile:
+    path: /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+    regexp: "c.Authenticator.admin_users ="
+    line: "c.Authenticator.admin_users = {'{{ansible_user}}'}"
+    insertafter: EOF
+
+- name: JupyterHub | Config | Set bind_url
+  lineinfile:
+    path: /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+    regexp: "c.JupyterHub.bind_url ="
+    line: "c.JupyterHub.bind_url = 'http://:8000/jupyter'"
+    insertafter: EOF
+
+- name: JupyterHub | Systemd | Setup Systemd service
+  file:
+    path: /opt/jupyterhub/etc/systemd
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: JupyterHub | service | Create service file
+  template:
+    src: jupyterhub.service.j2
+    dest: /opt/jupyterhub/etc/systemd/jupyterhub.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: JupyterHub | service | Link service file
+  file:
+    src: /opt/jupyterhub/etc/systemd/jupyterhub.service
+    dest: /etc/systemd/system/jupyterhub.service
+    state: link
+
+- name: JupyterHub | service | Enable service
+  systemd:
+    name: jupyterhub
+    enabled: true
+    daemon_reload: true
+    state: started

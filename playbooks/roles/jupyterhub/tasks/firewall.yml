@@ -1,0 +1,30 @@
+- name: JupyterHub | firewall | Setup firewall to deny all incoming traffic
+  ufw:
+    default: deny
+    direction: incoming
+
+- name: JupyterHub | firewall | Setup firewall to allow all outgoing traffic
+  ufw:
+    default: allow
+    direction: outgoing
+
+- name: JupyterHub | firewall | Setup firewall to allow SSH to {{ip_range}}
+  ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
+    to_ip: "{{ip_range}}"
+
+- name: JupyterHub | firewall | Setup firewall to allow HTTP to OpenVPN
+  ufw:
+    rule: allow
+    port: "80"
+    proto: tcp
+    to_ip: "{{openvpn_server_ip}}"
+  when: openvpn_server_ip is defined
+
+- name: JupyterHub | firewall | Enable firewall
+  ufw:
+    state: enabled
+  become: true
+  when: load_firewall_rules
