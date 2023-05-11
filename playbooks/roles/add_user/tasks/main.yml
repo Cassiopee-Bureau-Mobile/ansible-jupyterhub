@@ -1,0 +1,7 @@
+---
+- name: JupyterHub | Add User | Set variables
+  include_vars: ../../jupyterhub/defaults/main.yml
+
+- name: JupyterHub | Add User | Add user
+  include: add.yml
+  when: username is defined and password is defined
