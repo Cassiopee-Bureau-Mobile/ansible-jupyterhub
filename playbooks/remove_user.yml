@@ -8,4 +8,4 @@
     - remove_user
 #
 # ========================================================
-# sudo ansible-playbook playbooks/remove_user.yml -i inventories/cassiopee/hosts.ini --extra-vars "username=foo"
+# ansible-playbook playbooks/remove_user.yml -i inventories/cassiopee/hosts.ini --extra-vars "username=foo"

@@ -7,4 +7,4 @@
     - restart
 #
 # ========================================================
-# sudo ansible-playbook playbooks/restart.yml -i inventories/cassiopee/hosts.ini
+# ansible-playbook playbooks/restart.yml -i inventories/cassiopee/hosts.ini

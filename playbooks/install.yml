@@ -20,4 +20,4 @@
     - jupyterhub
 #
 # ========================================================
-# sudo ansible-playbook playbooks/install.yml -i inventories/cassiopee/hosts.ini
+# ansible-playbook playbooks/install.yml -i inventories/cassiopee/hosts.ini

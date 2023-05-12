@@ -8,4 +8,4 @@
     - add_user
 #
 # ========================================================
-# sudo ansible-playbook playbooks/add_user.yml -i inventories/cassiopee/hosts.ini --extra-vars "username=foo password=bar"
+# ansible-playbook playbooks/add_user.yml -i inventories/cassiopee/hosts.ini --extra-vars "username=foo password=bar"
