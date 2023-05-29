@@ -4,34 +4,44 @@
   register: existing_user
   ignore_errors: true
 
-- name: JupyterHub | Add User | Create user
-  user:
-    name: "{{ username }}"
-    password: "{{ password | password_hash('sha512') }}"
-    shell: /bin/bash
-    create_home: yes
-    home: /home/{{ username }}
-    state: present
-  when: existing_user.rc != 0
+- name: JupyterHub | Add User
+  block:
+    - name: JupyterHub | Add User | Create user
+      user:
+        name: "{{ username }}"
+        password: "{{ password | password_hash('sha512') }}"
+        shell: /bin/bash
+        create_home: yes
+        home: /home/{{ username }}
+        state: present
+      when: existing_user.rc != 0
 
-- name: JupyterHub | Add User | Run conda init bash from created user
-  become_user: "{{ username }}"
-  shell: source /etc/profile.d/conda.sh && conda init bash
-  when: existing_user.rc != 0
-  args:
-    executable: /bin/bash
+    - name: JupyterHub | Add User | Run conda init bash from created user
+      become_user: "{{ username }}"
+      shell: source /etc/profile.d/conda.sh && conda init bash
+      when: existing_user.rc != 0
+      args:
+        executable: /bin/bash
 
-- name: JupyterHub | Add User | Install Notebook-Runner for created user
-  become_user: "{{ username }}"
-  shell: /bin/bash -ic "pip install git+{{ notebook_runner_git_url }}"
-  when: existing_user.rc != 0
+    - name: JupyterHub | Add User | Install Notebook-Runner for created user
+      become_user: "{{ username }}"
+      shell: /bin/bash -ic "pip install git+{{ notebook_runner_git_url }}"
+      when: existing_user.rc != 0
 
-- name: JupyterHub | Add User | Install ipykernel for created user
-  become_user: "{{ username }}"
-  shell: /bin/bash -ic "conda install ipykernel -y"
-  when: existing_user.rc != 0
+    - name: JupyterHub | Add User | Install ipykernel for created user
+      become_user: "{{ username }}"
+      shell: /bin/bash -ic "conda install ipykernel -y"
+      when: existing_user.rc != 0
 
-- name: JupyterHub | Add User | Register ipykernel for created user
-  become_user: "{{ username }}"
-  shell: /bin/bash -ic "python -m ipykernel install --user --name {{username}} --display-name 'Python ({{username}})'"
-  when: existing_user.rc != 0
+    - name: JupyterHub | Add User | Register ipykernel for created user
+      become_user: "{{ username }}"
+      shell: /bin/bash -ic "python -m ipykernel install --user --name {{username}} --display-name 'Python ({{username}})'"
+      when: existing_user.rc != 0
+
+  rescue:
+    - name: JupyterHub | Add User | Remove user
+      user:
+        name: "{{ username }}"
+        state: absent
+        force: true
+      when: existing_user.rc != 0
