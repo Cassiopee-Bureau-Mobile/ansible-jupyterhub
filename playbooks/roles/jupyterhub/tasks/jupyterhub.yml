@@ -12,22 +12,11 @@
   args:
     chdir: /opt/jupyterhub/etc/jupyterhub
     creates: /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
-  register: jupyterhub_config_result
-
-- name: JupyterHub | Get Token | Make local destination folder
-  local_action: file path="{{ playbook_dir }}/../auth/" state=directory
-  become: true
-  when: jupyterhub_config_result.changed
-
-- name: JupyterHub | Get Token | Remove old token
-  local_action: file path="{{ playbook_dir }}/../auth/token" state=absent
-  become: true
-  when: jupyterhub_config_result.changed
 
 - name: JupyterHub | Get Token | Generate token using openssl
   shell: openssl rand -hex 32
   register: jupyterhub_token_result
-  when: jupyterhub_config_result.changed
+  when: jupyterhub_token is not defined
 
 - name: JupyterHub | Get Token | Set token inside JupyterConfig
   lineinfile:
@@ -35,15 +24,15 @@
     regexp: "c.JupyterHub.services ="
     line: "c.JupyterHub.services = [{'name': 'service-token' , 'admin': True, 'api_token': '{{jupyterhub_token_result.stdout}}' }]"
     insertafter: EOF
-  when: jupyterhub_config_result.changed
+  when: jupyterhub_token is not defined
 
 - name: JupyterHub | Get Token | Store token
   local_action:
     module: lineinfile
-    line: "{{ jupyterhub_token_result.stdout }}"
-    path: "{{ playbook_dir }}/../auth/token"
+    line: "jupyterhub_token: {{ jupyterhub_token_result.stdout }}"
+    path: "{{ inventory_dir }}/host_vars/{{inventory_hostname}}.yml"
     create: true
-  when: jupyterhub_config_result.changed
+  when: jupyterhub_token is not defined
 
 - name: JupyterHub | Config | Set default_url
   lineinfile:
