@@ -1,7 +1,8 @@
 - name: Restart JupyterHub
   # ========================================================
   hosts: "{{ cmd_hosts | default('jupyterhub') }}"
-  become: true
+  become: "{{ cmd_become | default('true') }}"
+  ignore_errors: "{{ cmd_ignore_errors | default('false') }}"
 
   roles:
     - restart
